@@ -11,6 +11,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console") // 콘솔창 띄우기
 
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
@@ -66,6 +67,8 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_DLG, &CgPrjDlg::OnBnClickedBtnDlg)
+	ON_BN_CLICKED(IDC_BTN_DLG, &CgPrjDlg::OnBnClickedBtnDlg)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -101,6 +104,11 @@ BOOL CgPrjDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	// 모달리스 다이얼로그 생성
+	m_pDlgIamge = new CDlgImage;
+	m_pDlgIamge->Create(IDD_CDlgImage, this); //(자식ID, 부모Window) 이거써줘야 접근 가능
+	m_pDlgIamge->ShowWindow(SW_SHOW);
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -158,6 +166,21 @@ HCURSOR CgPrjDlg::OnQueryDragIcon()
 
 void CgPrjDlg::OnBnClickedBtnDlg()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	// gitTest
+	m_pDlgIamge->ShowWindow(SW_SHOW); // 클릭했을 때 뜨게 함
+}
+
+
+void CgPrjDlg::OnDestroy()
+{
+	//메모리 leak 제거 - new 쓰면 delete 해주기
+	CDialogEx::OnDestroy();
+	delete m_pDlgIamge;
+}
+
+#include <iostream>
+void CgPrjDlg::callFunc(int n)
+{
+	//int nData = n;
+	std::cout << n << std::endl;
 }
