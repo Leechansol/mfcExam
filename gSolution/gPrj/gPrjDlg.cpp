@@ -7,13 +7,14 @@
 #include "gPrj.h"
 #include "gPrjDlg.h"
 #include "afxdialogex.h"
+#include <iostream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console") // 콘솔창 띄우기
 
-
+using namespace std;
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
 class CAboutDlg : public CDialogEx
@@ -66,9 +67,8 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BTN_DLG, &CgPrjDlg::OnBnClickedBtnDlg)
-	ON_BN_CLICKED(IDC_BTN_DLG, &CgPrjDlg::OnBnClickedBtnDlg)
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_TEST, &CgPrjDlg::OnBnClickedBtnTest)
 END_MESSAGE_MAP()
 
 
@@ -104,11 +104,19 @@ BOOL CgPrjDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	//윈도우 크기 조절
+	MoveWindow(0, 0, 1280, 800);
 	// 모달리스 다이얼로그 생성
-	m_pDlgIamge = new CDlgImage;
-	m_pDlgIamge->Create(IDD_CDlgImage, this); //(자식ID, 부모Window) 이거써줘야 접근 가능
-	m_pDlgIamge->ShowWindow(SW_SHOW);
+	m_pDlgImage = new CDlgImage;
+	m_pDlgImage->Create(IDD_CDlgImage, this); //(자식ID, 부모Window) 이거써줘야 접근 가능
+	m_pDlgImage->ShowWindow(SW_SHOW);
+	m_pDlgImage->MoveWindow(0, 0, 640, 480);
 
+	// 모달리스 다이얼로그 생성
+	m_pDlgImgRes = new CDlgImage;
+	m_pDlgImgRes->Create(IDD_CDlgImage, this); //(자식ID, 부모Window) 이거써줘야 접근 가능
+	m_pDlgImgRes->ShowWindow(SW_SHOW);
+	m_pDlgImgRes->MoveWindow(640, 0, 640, 480);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -164,23 +172,43 @@ HCURSOR CgPrjDlg::OnQueryDragIcon()
 
 
 
-void CgPrjDlg::OnBnClickedBtnDlg()
-{
-	// gitTest
-	m_pDlgIamge->ShowWindow(SW_SHOW); // 클릭했을 때 뜨게 함
-}
-
-
 void CgPrjDlg::OnDestroy()
 {
 	//메모리 leak 제거 - new 쓰면 delete 해주기
 	CDialogEx::OnDestroy();
-	delete m_pDlgIamge;
+	delete m_pDlgImage;
 }
 
-#include <iostream>
+
 void CgPrjDlg::callFunc(int n)
 {
 	//int nData = n;
 	std::cout << n << std::endl;
+}
+
+
+void CgPrjDlg::OnBnClickedBtnTest()
+{
+	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+
+	for (int k = 0; k < 100; k++) {
+		int x = rand() % nWidth;
+		int y = rand() % nHeight;
+		fm[y * nPitch + x] = 0;
+	}
+	int nSum = 0;
+	for (int j = 0; j < nHeight; j++) {
+		for (int i = 0; i < nWidth; i++) {
+			if (fm[j * nPitch + i] == 0) {
+				cout << i << "," << j << endl;
+				nSum++;
+			}
+				
+		}
+	}
+	cout << nSum << endl;
+	m_pDlgImage->Invalidate(); //화면에 업데이트, onpaint함수 콜
 }
