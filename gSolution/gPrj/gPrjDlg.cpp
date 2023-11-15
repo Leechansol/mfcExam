@@ -195,21 +195,21 @@ void CgPrjDlg::OnBnClickedBtnTest()
 	int nHeight = m_pDlgImage->m_image.GetHeight();
 	int nPitch = m_pDlgImage->m_image.GetPitch();
 
-	memset(fm, 0xff, nWidth*nHeight); // 초기화 안해주면 포인트데이터 100개씩 추가됨
+	memset(fm, 0, nWidth*nHeight); // 초기화 안해주면 포인트데이터 100개씩 추가됨
 
 	//랜덤하게 xy 포인트 만들어서 이미지 포인터에 넣음
-	for (int k = 0; k < 100; k++) {
+	for (int k = 0; k < MAX_POINT; k++) { // 점 100개
 		int x = rand() % nWidth;
 		int y = rand() % nHeight;
-		fm[y * nPitch + x] = 0;
+		fm[y * nPitch + x] = rand()%0xff;
 	}
 
 	// 포인트 데이터 넣음
 	int nIndex = 0;
 	for (int j = 0; j < nHeight; j++) {
 		for (int i = 0; i < nWidth; i++) {
-			if (fm[j * nPitch + i] == 0) {
-				if (m_pDlgImgRes->m_nDataCount < 100) {
+			if (fm[j * nPitch + i] != 0) {
+				if (m_pDlgImgRes->m_nDataCount < MAX_POINT) {
 					m_pDlgImgRes->m_ptData[nIndex].x = i;
 					m_pDlgImgRes->m_ptData[nIndex].y = j;
 					m_pDlgImgRes->m_nDataCount = ++nIndex;

@@ -70,11 +70,16 @@ void CDlgImage::OnPaint()
 	drawData(&dc);
 }
 
+
+#define COLOR_RED RGB(0xff, 0, 0)
+#define COLOR_GREEN RGB(0, 0xff, 0)
+#define COLOR_BLUE RGB(0, 0, 0xff)
+
 void CDlgImage::drawData(CDC* pDC)
 {
 	CRect rect;
 	CPen pen;
-	pen.CreatePen(PS_SOLID, 1, RGB(0xff, 0, 0)); //펜모양, 굵기, 색깔
+	pen.CreatePen(PS_SOLID, 1, COLOR_RED); //펜모양, 굵기, 색깔
 	CPen* pOldPen = pDC->SelectObject(&pen);
 
 	for (int i = 0; i < m_nDataCount; i++) {
