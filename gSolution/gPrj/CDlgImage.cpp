@@ -66,6 +66,23 @@ void CDlgImage::OnPaint()
 	if (m_image) {
 		m_image.Draw(dc, 0, 0);
 	}
+
+	drawData(&dc);
+}
+
+void CDlgImage::drawData(CDC* pDC)
+{
+	CRect rect;
+	CPen pen;
+	pen.CreatePen(PS_SOLID, 1, RGB(0xff, 0, 0)); //펜모양, 굵기, 색깔
+	CPen* pOldPen = pDC->SelectObject(&pen);
+
+	for (int i = 0; i < m_nDataCount; i++) {
+		rect.SetRect(m_ptData[i], m_ptData[i]); // 똑같은 포인트 줬음
+		rect.InflateRect(5, 5); // 점으로 줬으니까 크기 늘리기
+		pDC->Ellipse(rect); // 타원그리기
+	}
+	pDC->SelectObject(pOldPen);
 }
 
 

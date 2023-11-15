@@ -176,7 +176,8 @@ void CgPrjDlg::OnDestroy()
 {
 	//메모리 leak 제거 - new 쓰면 delete 해주기
 	CDialogEx::OnDestroy();
-	delete m_pDlgImage;
+	if (m_pDlgImage)	delete m_pDlgImage;
+	if (m_pDlgImgRes)	delete m_pDlgImgRes;
 }
 
 
@@ -194,21 +195,30 @@ void CgPrjDlg::OnBnClickedBtnTest()
 	int nHeight = m_pDlgImage->m_image.GetHeight();
 	int nPitch = m_pDlgImage->m_image.GetPitch();
 
+	memset(fm, 0xff, nWidth*nHeight); // 초기화 안해주면 포인트데이터 100개씩 추가됨
+
+	//랜덤하게 xy 포인트 만들어서 이미지 포인터에 넣음
 	for (int k = 0; k < 100; k++) {
 		int x = rand() % nWidth;
 		int y = rand() % nHeight;
 		fm[y * nPitch + x] = 0;
 	}
-	int nSum = 0;
+
+	// 포인트 데이터 넣음
+	int nIndex = 0;
 	for (int j = 0; j < nHeight; j++) {
 		for (int i = 0; i < nWidth; i++) {
 			if (fm[j * nPitch + i] == 0) {
-				cout << i << "," << j << endl;
-				nSum++;
+				if (m_pDlgImgRes->m_nDataCount < 100) {
+					m_pDlgImgRes->m_ptData[nIndex].x = i;
+					m_pDlgImgRes->m_ptData[nIndex].y = j;
+					m_pDlgImgRes->m_nDataCount = ++nIndex;
+				}
 			}
 				
 		}
 	}
-	cout << nSum << endl;
+
 	m_pDlgImage->Invalidate(); //화면에 업데이트, onpaint함수 콜
+	m_pDlgImgRes->Invalidate();
 }
