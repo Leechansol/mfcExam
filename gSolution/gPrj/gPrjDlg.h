@@ -40,4 +40,5 @@ public:
 	afx_msg void OnBnClickedBtnTest();
 	afx_msg void OnBnClickedBtnPrc();
 	afx_msg void OnBnClickedBtnPattern();
+	afx_msg void OnBnClickedBtnGetData();
 };
