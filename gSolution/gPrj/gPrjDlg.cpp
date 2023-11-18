@@ -70,6 +70,7 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_TEST, &CgPrjDlg::OnBnClickedBtnTest)
+	ON_BN_CLICKED(IDC_BTN_PRC, &CgPrjDlg::OnBnClickedBtnPrc)
 END_MESSAGE_MAP()
 
 
@@ -207,9 +208,10 @@ void CgPrjDlg::OnBnClickedBtnTest()
 
 	// 포인트 데이터 넣음
 	int nIndex = 0;
+	int nTh = 100;
 	for (int j = 0; j < nHeight; j++) {
 		for (int i = 0; i < nWidth; i++) {
-			if (fm[j * nPitch + i] > 100) {
+			if (fm[j * nPitch + i] > nTh) {
 				if (m_pDlgImgRes->m_nDataCount < MAX_POINT) {
 					m_pDlgImgRes->m_ptData[nIndex].x = i;
 					m_pDlgImgRes->m_ptData[nIndex].y = j;
@@ -222,4 +224,17 @@ void CgPrjDlg::OnBnClickedBtnTest()
 	}
 	m_pDlgImage->Invalidate(); //화면에 업데이트, onpaint함수 콜
 	m_pDlgImgRes->Invalidate();
+}
+
+
+#include "CProcess.h"
+#include <chrono>
+void CgPrjDlg::OnBnClickedBtnPrc()
+{
+	CProcess process;
+	auto start = std::chrono::system_clock::now(); //auto : 변수형태 일단은 정하지 않겠다.
+	int nRet = process.getStarInfo(&m_pDlgImage->m_image);
+	auto end = std::chrono::system_clock::now();
+	auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
+	cout << nRet << "\t" << millisec.count() << "ms" << endl;
 }
