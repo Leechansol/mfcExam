@@ -8,6 +8,7 @@
 #include "gPrjDlg.h"
 #include "afxdialogex.h"
 #include <iostream>
+using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -105,7 +106,7 @@ BOOL CgPrjDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	//윈도우 크기 조절
-	MoveWindow(0, 0, 1280, 800);
+	MoveWindow(0, 0, 1280, 720);
 	// 모달리스 다이얼로그 생성
 	m_pDlgImage = new CDlgImage;
 	m_pDlgImage->Create(IDD_CDlgImage, this); //(자식ID, 부모Window) 이거써줘야 접근 가능
@@ -208,17 +209,17 @@ void CgPrjDlg::OnBnClickedBtnTest()
 	int nIndex = 0;
 	for (int j = 0; j < nHeight; j++) {
 		for (int i = 0; i < nWidth; i++) {
-			if (fm[j * nPitch + i] != 0) {
+			if (fm[j * nPitch + i] > 100) {
 				if (m_pDlgImgRes->m_nDataCount < MAX_POINT) {
 					m_pDlgImgRes->m_ptData[nIndex].x = i;
 					m_pDlgImgRes->m_ptData[nIndex].y = j;
 					m_pDlgImgRes->m_nDataCount = ++nIndex;
+					
 				}
 			}
 				
 		}
 	}
-
 	m_pDlgImage->Invalidate(); //화면에 업데이트, onpaint함수 콜
 	m_pDlgImgRes->Invalidate();
 }
