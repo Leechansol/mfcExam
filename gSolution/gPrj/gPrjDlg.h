@@ -39,4 +39,5 @@ public:
 	void callFunc(int n);
 	afx_msg void OnBnClickedBtnTest();
 	afx_msg void OnBnClickedBtnPrc();
+	afx_msg void OnBnClickedBtnPattern();
 };
