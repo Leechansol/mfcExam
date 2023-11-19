@@ -41,4 +41,6 @@ public:
 	afx_msg void OnBnClickedBtnPrc();
 	afx_msg void OnBnClickedBtnPattern();
 	afx_msg void OnBnClickedBtnGetData();
+	afx_msg void OnBnClickedBtnThread();
+	int processImg(CRect rect);
 };

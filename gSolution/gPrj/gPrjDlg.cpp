@@ -8,7 +8,6 @@
 #include "gPrjDlg.h"
 #include "afxdialogex.h"
 #include <iostream>
-using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -73,6 +72,7 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_PRC, &CgPrjDlg::OnBnClickedBtnPrc)
 	ON_BN_CLICKED(IDC_BTN_PATTERN, &CgPrjDlg::OnBnClickedBtnPattern)
 	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CgPrjDlg::OnBnClickedBtnGetData)
+	ON_BN_CLICKED(IDC_BTN_THREAD, &CgPrjDlg::OnBnClickedBtnThread)
 END_MESSAGE_MAP()
 
 
@@ -231,13 +231,17 @@ void CgPrjDlg::OnBnClickedBtnTest()
 
 #include "CProcess.h"
 #include <chrono>
+#include <thread>
+using namespace std;
+using namespace chrono;
+
 void CgPrjDlg::OnBnClickedBtnPrc()
 {
 	CProcess process;
-	auto start = std::chrono::system_clock::now(); //auto : 변수형태 일단은 정하지 않겠다.
+	auto start = system_clock::now(); //auto : 변수형태 일단은 정하지 않겠다.
 	int nRet = process.getStarInfo(&m_pDlgImage->m_image);
-	auto end = std::chrono::system_clock::now();
-	auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
+	auto end = system_clock::now();
+	auto millisec = duration_cast<milliseconds>(end-start);
 	cout << nRet << "\t" << millisec.count() << "ms" << endl;
 }
 
@@ -288,4 +292,66 @@ void CgPrjDlg::OnBnClickedBtnGetData()
 	double dCenterY = (double)nSumY / nCount;
 
 	cout << dCenterX << "\t" << dCenterY << endl;
+}
+
+// 스레드
+void threadProcess(CWnd* pParent, CRect rect, int* nRet) // global로 선언
+{
+	CgPrjDlg* pWnd = (CgPrjDlg*)pParent;
+	*nRet = pWnd->processImg(rect); // parent에서 processImg
+}
+
+void CgPrjDlg::OnBnClickedBtnThread()
+{
+	auto start = system_clock::now();
+
+	int imgSize = 4096 * 4;
+
+	CRect rect(0, 0, imgSize, imgSize);
+	CRect rt[4];
+
+	int nRet[4] = { 0,0,0,0 };
+	/*
+	rt[0].SetRect(0, 0, imgSize, imgSize);
+	rt[1].SetRect(imgSize, 0, imgSize*2, imgSize);
+	rt[2].SetRect(0, imgSize, imgSize, imgSize*2);
+	rt[3].SetRect(imgSize, imgSize, imgSize*2, imgSize*2);
+	*/
+	for (int k = 0; k < 4; k++) {
+		rt[k] = rect;
+		rt[k].OffsetRect(imgSize * (k%2), imgSize * int(k/2)); // OffsetRect : x축, y축으로 일정 영역만큼 움직여라
+	}
+
+	thread _thread0(threadProcess, this, rt[0], &nRet[0]); // thread call
+	thread _thread1(threadProcess, this, rt[1], &nRet[1]);
+	thread _thread2(threadProcess, this, rt[2], &nRet[2]);
+	thread _thread3(threadProcess, this, rt[3], &nRet[3]);
+
+	_thread0.detach();
+	_thread1.detach();
+	_thread2.detach();
+	_thread3.detach();
+
+	int nSum = 0;
+	for (int i = 0; i < 4; i++)
+		nSum += nRet[i];
+
+	auto end = system_clock::now();
+	auto millisec = duration_cast<milliseconds>(end - start);
+
+	cout << "main: " << nSum << "\t" << millisec.count() * 0.001 << "sec" << endl;
+}
+
+int CgPrjDlg::processImg(CRect rect)
+{
+	auto start = system_clock::now();
+	CProcess process;
+	int nRet = process.getStarInfo(&m_pDlgImage->m_image, 0, rect);
+
+	auto end = system_clock::now();
+	auto millisec = duration_cast<milliseconds>(end - start);
+
+	cout << "thread : " << nRet << "\t" << millisec.count() * 0.001 << "sec" << endl;
+
+	return nRet;
 }
